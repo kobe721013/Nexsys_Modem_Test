@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.verifone.sample.testSDLC"
-        minSdkVersion 22
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
         versionName "1.3"
@@ -35,6 +35,9 @@ android {
             java.srcDirs = ['src/main/java', 'src/main/aidl']
         }
     }
+    buildFeatures {
+        viewBinding true
+    }
     android.applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "Test_SDLC_${variant.versionName}_${releaseTime()}.apk"
@@ -47,6 +50,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.navigation:navigation-fragment:2.3.5'
+    implementation 'androidx.navigation:navigation-ui:2.3.5'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

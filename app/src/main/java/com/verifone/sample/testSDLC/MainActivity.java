@@ -2,6 +2,10 @@ package com.verifone.sample.testSDLC;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,6 +19,7 @@ import android.widget.TextView;
 
 import com.verifone.sample.testSDLC.utils.HexDump;
 import com.verifone.sample.testSDLC.utils.InstallReceiverManager;
+import com.verifone.sample.testSDLC.utils.KrNrModemManager;
 import com.verifone.sample.testSDLC.utils.SDLCServiceManager;
 import com.verifone.sample.testSDLC.utils.ServiceManager;
 import com.verifone.smartpos.sdlc.aidl.SdlcListener;
@@ -32,12 +37,18 @@ public class MainActivity extends AppCompatActivity {
 
     TextView edLogOutput;
 
+    KrNrModemManager krnrmodemManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Log.d(TAG,"onCreated");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         edLogOutput = findViewById(R.id.logmessage);
+
+//        krnrmodemManager = new KrNrModemManager(getApplicationContext());
 
         sdlcServiceManager = new SDLCServiceManager(this, new ServiceManager.ServiceManagerIF() {
             @Override
@@ -79,7 +90,19 @@ public class MainActivity extends AppCompatActivity {
         installReceiver.registerInstallReceiver();
     }
 
-    void setEnabled( int id, boolean enable){
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG,"onRestart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume");
+    }
+
+    void setEnabled(int id, boolean enable){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -112,22 +135,61 @@ public class MainActivity extends AppCompatActivity {
     SdlcListener sdlcListener;
 
     public void btnBind(View view) {
-        if( sdlcServiceManager.getStatus() != ServiceManager.Status.connected ){
-            sdlcServiceManager.connect();
-        }
+//        if( sdlcServiceManager.getStatus() != ServiceManager.Status.connected ){
+//            sdlcServiceManager.connect();
+//        }
+
+        Log.d(TAG, "btnBind click.");
+        // 綁定 Service
+        Intent serviceIntent = new Intent(this, KrNrService.class);
+        this.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 
     }
+
+    public KrNrService krnrService;
+    public ServiceConnection connection = new ServiceConnection() {
+
+        // 成功與 Service 建立連線
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            krnrService = ((KrNrService.MyBinder) service).getService();
+            Log.d(TAG, "MainActivity onServiceConnected");
+
+            krnrService.timerStart();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(3000);
+                        Log.d(TAG, String.format("sleep 3 ...DONE....count=%i", krnrService.currentCount));
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        // 與 Service 建立連線失敗
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            krnrService = null;
+            Log.d(TAG, "MainActivity onServiceFailed");
+        }
+    };
 
     int loop_count = 0;
 
     public void btnInit(View view) {
-        setEnabled( R.id.btnInit, false );
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dial_Init();
-            }
-        }).start();
+
+        startActivity(new Intent(this, MainActivity_2.class));
+//        setEnabled( R.id.btnInit, false );
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                dial_Init();
+//            }
+//        }).start();
 
     }
     public void dial_Init() {

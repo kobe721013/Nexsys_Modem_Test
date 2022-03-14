@@ -34,7 +34,7 @@
                 android:layout_marginLeft="5px"
                 android:layout_marginRight="5px"
                 android:layout_weight="1"
-                android:enabled="false"
+                android:enabled="true"
                 android:onClick="btnInit"
                 android:text="Init" />
 
