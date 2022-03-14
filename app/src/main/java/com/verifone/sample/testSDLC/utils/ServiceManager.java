@@ -192,12 +192,14 @@ public class ServiceManager {
     private ServiceConnection conn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            status = Status.connected;
             Log.i(TAG, "onServiceConnected," + name.getPackageName() + " , " + name.getShortClassName());
             onConnected(service);
             if (null != serviceManagerIF) {
+                Log.d(TAG, "callback service onConnected()");
                 serviceManagerIF.onConnected(service);
             }
-            status = Status.connected;
+
         }
 
         @Override

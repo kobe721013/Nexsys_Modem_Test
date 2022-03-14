@@ -60,7 +60,10 @@ public class KrNrModemManager {
 
             @Override
             public void onConnected(IBinder service) {
+
                 Log.d(TAG, "Service onConnected" );
+
+                modemDeinit();
             }
 
             @Override
@@ -73,7 +76,7 @@ public class KrNrModemManager {
         sdlcServiceManager.connect();
     }
 
-    public void modemInit() {
+    private void modemInit() {
 
         if( sdlcServiceManager.isConnected() ){
             Bundle bundle = new Bundle();
@@ -164,6 +167,10 @@ public class KrNrModemManager {
                 Log.e(TAG, String.format("modemDeinit error. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
+        }
+        else
+        {
+            Log.e(TAG, "Service Didconeected");
         }
     }
 

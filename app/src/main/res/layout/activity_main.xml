@@ -215,7 +215,7 @@
                 android:layout_marginRight="5px"
 
                 android:layout_weight="1"
-                android:enabled="false"
+                android:enabled="true"
                 android:onClick="btnDial"
                 android:text="Dial" />
 

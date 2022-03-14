@@ -48,46 +48,47 @@ public class MainActivity extends AppCompatActivity {
 
         edLogOutput = findViewById(R.id.logmessage);
 
-//        krnrmodemManager = new KrNrModemManager(getApplicationContext());
+        krnrmodemManager = KrNrModemManager.getInstance(getApplicationContext());
 
-        sdlcServiceManager = new SDLCServiceManager(this, new ServiceManager.ServiceManagerIF() {
-            @Override
-            public void onBindSuccess() {
-                //
-                Log.d(TAG, "onBindSuccess" );
-            }
 
-            @Override
-            public void onBindFails() {
-                Log.e(TAG, "onBindFails" );
-            }
-
-            @Override
-            public void onConnected(IBinder service) {
-                Log.d(TAG, "onConnected" );
-
-                setEnabled(R.id.btnInit, true);
-
-            }
-
-            @Override
-            public void onDisconnected() {
-                Log.w(TAG, "onDisconnected" );
-
-            }
-        });
-
-        sdlcServiceManager.connect();
-
-        installReceiver = new InstallReceiverManager(this, new InstallReceiverManager.InstallCallback() {
-            @Override
-            public void installSuccessCallback(String packageName) {
-                if( packageName == sdlcServiceManager.SERVICE_PACKAGE ){
-                    sdlcServiceManager.connect();
-                }
-            }
-        });
-        installReceiver.registerInstallReceiver();
+//        sdlcServiceManager = new SDLCServiceManager(this, new ServiceManager.ServiceManagerIF() {
+//            @Override
+//            public void onBindSuccess() {
+//                //
+//                Log.d(TAG, "onBindSuccess" );
+//            }
+//
+//            @Override
+//            public void onBindFails() {
+//                Log.e(TAG, "onBindFails" );
+//            }
+//
+//            @Override
+//            public void onConnected(IBinder service) {
+//                Log.d(TAG, "onConnected" );
+//
+//                setEnabled(R.id.btnInit, true);
+//
+//            }
+//
+//            @Override
+//            public void onDisconnected() {
+//                Log.w(TAG, "onDisconnected" );
+//
+//            }
+//        });
+//
+//        sdlcServiceManager.connect();
+//
+//        installReceiver = new InstallReceiverManager(this, new InstallReceiverManager.InstallCallback() {
+//            @Override
+//            public void installSuccessCallback(String packageName) {
+//                if( packageName == sdlcServiceManager.SERVICE_PACKAGE ){
+//                    sdlcServiceManager.connect();
+//                }
+//            }
+//        });
+//        installReceiver.registerInstallReceiver();
     }
 
     @Override
@@ -296,18 +297,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnDial(View view) {
-        setEnabled( R.id.btnDial, false );
-        setEnabled( R.id.btnHangup, true );
+//        setEnabled( R.id.btnDial, false );
+//        setEnabled( R.id.btnHangup, true );
+//
+//        setEnabled( R.id.btnAuto, false );
 
-        setEnabled( R.id.btnAuto, false );
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dial_dial();
-            }
-        }).start();
-
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                dial_dial();
+//            }
+//        }).start();
+//=====
+        krnrmodemManager.modemDial("0926334779");
     }
     void dial_dial() {
 
