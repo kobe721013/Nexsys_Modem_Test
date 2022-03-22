@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity_2">
+    tools:context=".MainActivity_Demo">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/btnBind"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5px"
             android:layout_marginRight="5px"
-
+            android:visibility="gone"
             android:layout_weight="1"
             android:onClick="btnBind"
             android:text="Bind" />
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5px"
             android:layout_marginRight="5px"
-
+            android:visibility="gone"
             android:layout_weight="1"
             android:onClick="btnGetCount"
             android:text="GetCount" />
@@ -39,15 +39,62 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5px"
             android:layout_marginRight="5px"
-
+            android:visibility="gone"
             android:layout_weight="1"
             android:onClick="btnClose"
             android:text="Close" />
 
+        <Button
+            android:id="@+id/btnDial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5px"
+            android:layout_marginRight="5px"
+
+            android:layout_weight="1"
+            android:onClick="btnDial"
+            android:text="Dial" />
+
+        <Button
+            android:id="@+id/btnHandup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5px"
+            android:layout_marginRight="5px"
+
+            android:layout_weight="1"
+            android:onClick="btnHandup"
+            android:text="Handup" />
         <TextView
             android:id="@+id/textViewMessage"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            />
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/logmessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:fontFamily="serif"
+                android:inputType="text|textMultiLine"
+                android:lineSpacingExtra="8sp"
+                android:nestedScrollingEnabled="true"
+                android:outlineProvider="background"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbars="vertical"
+                android:singleLine="false"
+                android:text="Message output"
+                android:verticalScrollbarPosition="defaultPosition"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:singleLine="false" />
+        </ScrollView>
 
     </LinearLayout>
 

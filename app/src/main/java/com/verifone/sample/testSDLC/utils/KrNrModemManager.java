@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 public class KrNrModemManager {
     private static final String TAG = "KrNrModemManager";
+
     public interface KrNrModemManagerDelegate
     {
         void onDialConnected();
@@ -29,10 +30,10 @@ public class KrNrModemManager {
     }
 
 
-    private SdlcListener sdlcListener;
+    private SdlcListener sdlcListener = null;
     private SDLCServiceManager sdlcServiceManager;
     private static KrNrModemManager instance = null;
-    private int loopCount = 0;
+
 
     //Singleton
     public KrNrModemManagerDelegate delegate = null;
@@ -50,25 +51,24 @@ public class KrNrModemManager {
             @Override
             public void onBindSuccess() {
                 //
-                Log.d(TAG, "Service onBindSuccess" );
+                Log.d(TAG, "SDLC Service onBindSuccess() event." );
             }
 
             @Override
             public void onBindFails() {
-                Log.e(TAG, "Service onBindFails" );
+                Log.e(TAG, "SDLC Service onBindFails() event." );
             }
 
             @Override
             public void onConnected(IBinder service) {
 
-                Log.d(TAG, "Service onConnected" );
-
-                modemDeinit();
+                Log.d(TAG, "SDLC Service onConnected() event." );
+                modemInit();
             }
 
             @Override
             public void onDisconnected() {
-                Log.w(TAG, "Service onDisconnected" );
+                Log.w(TAG, "SDLE Service onDisconnected() event." );
             }
         });
 
@@ -79,6 +79,7 @@ public class KrNrModemManager {
     private void modemInit() {
 
         if( sdlcServiceManager.isConnected() ){
+            Log.d(TAG, "modemInit()");
             Bundle bundle = new Bundle();
 //            bundle.putInt(ConstSDLCService.init.logLevel, Log.VERBOSE );
             bundle.putInt(ConstSDLCService.init.logLevel, Log.WARN );
@@ -90,32 +91,26 @@ public class KrNrModemManager {
 
 
                 if( sdlcListener == null ){
+
+                    Log.d(TAG, "sdlcListener init....");
                     sdlcListener = new SdlcListener.Stub() {
                         @Override
                         public void onConnect() throws RemoteException {
-                            Log.i(TAG, "onConnect: " );
-                            Log.i(TAG, "Line - Connected");
-//                            if( autoDialstep == 1 ){
-//                                // call send
-//                                Message msg = new Message();
-//                                msg.getData().putString("type", "value" );
-//                                sdlc_auto_test.sendMessage(msg);
-//
-//                            } else {
-                                if(delegate != null)
-                                {
-                                    Log.d(TAG, "callback onDialConnected()");
-                                    delegate.onDialConnected();
-                                }
-//                            }
+                            //notes:測試過，撥通沒有event上來
+                            Log.i(TAG, "Line - onConnect() event");
 
+                            if(delegate != null)
+                            {
+                                Log.d(TAG, "callback To onDialConnected()");
+                                delegate.onDialConnected();
+                            }
                         }
 
                         @Override
                         public void onDisconect() throws RemoteException {
-                            Log.i(TAG, "onDisconect, loop count: " + loopCount );
-                            Log.i(TAG, "Line - hanguped");
-                            //autoDialstep = 0;
+
+                            Log.i(TAG, "Line onDisconect() event.");
+
 
 //                            if( loopCount > 1 ) {
 //                                try {
@@ -129,10 +124,10 @@ public class KrNrModemManager {
 //
 //                            } else {
 
-                                Log.i(TAG, "Dial disconnected");
+
                                 if(delegate != null)
                                 {
-                                    Log.i(TAG, "Callback, Dial disconnected()");
+                                    Log.i(TAG, "callback to onDialDisconnected()");
                                     delegate.onDialDisconnected();
                                 }
 //                            }
@@ -140,21 +135,22 @@ public class KrNrModemManager {
 
                         @Override
                         public void onFail(int code, String message) throws RemoteException {
-                            Log.e(TAG, "onFail: " + code + ", "+ message );
+                            Log.e(TAG, String.format("Line - onFail event. code=%d. message=%s", code, message) );
                             if(delegate != null)
                             {
+                                Log.i(TAG, "callback to onDialFailed()");
                                 delegate.onDialFailed(code, message);
                             }
-//                            autoDialstep = 0;
                         }
                     };
                 }
 
             } catch (RemoteException e) {
+                Log.e(TAG, String.format("modemInit() Exception occurs. Exception=%s",e.toString()));
                 e.printStackTrace();
             }
         } else {
-            Log.e(TAG, "not connect with SDLC service");
+            Log.e(TAG, "modemInit() - not connect with SDLC service");
         }
     }
 
@@ -164,27 +160,27 @@ public class KrNrModemManager {
             try {
                 sdlcServiceManager.getIsdlcService().deinit(bundle);
             } catch (RemoteException e) {
-                Log.e(TAG, String.format("modemDeinit error. Exception:%s", e.toString()));
+                Log.e(TAG, String.format("modemDeinit Exception occurs. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
         }
         else
         {
-            Log.e(TAG, "Service Didconeected");
+            Log.e(TAG, "modemDeinit() - but SDLC Service status is disconnected");
         }
     }
 
-    public void modemDial(String phoneNmmber) {
+    public void dialTo(String phoneNmmber) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                dial_dial(phoneNmmber);
+                dialto(phoneNmmber);
             }
         }).start();
 
     }
-    private void dial_dial(String phoneNmmber) {
+    private void dialto(String phoneNmmber) {
 
         if( sdlcServiceManager.isConnected() ){
             Bundle bundle = new Bundle();
@@ -208,7 +204,7 @@ public class KrNrModemManager {
                 Log.d(TAG, "Dialing ...");
                 sdlcServiceManager.getIsdlcService().dialup(bundle, sdlcListener );
             } catch (RemoteException e) {
-                Log.e(TAG, String.format("dial_dial error. Exception:%s", e.toString()));
+                Log.e(TAG, String.format("dialto() Exception occurs. Exception=%s", e.toString()));
                 e.printStackTrace();
             }
 
@@ -218,7 +214,7 @@ public class KrNrModemManager {
 
     byte[] msg_sent;
 
-    public void dialSend(byte[] data) {
+    public void send(byte[] data) {
 
         new Thread(new Runnable() {
             @Override
@@ -239,6 +235,9 @@ public class KrNrModemManager {
                     delegate.onSendDone(resultCode);
                 }
 
+                //start to receive data
+                dialreceive();
+
             } catch (RemoteException e) {
                 Log.e(TAG, String.format("dial_send error. Exception:%s", e.toString()));
                 e.printStackTrace();
@@ -246,7 +245,7 @@ public class KrNrModemManager {
         }
     }
 
-    public void dialReceive() {
+    public void receive() {
 
         new Thread(
                 new Runnable() {
@@ -265,7 +264,7 @@ public class KrNrModemManager {
             Bundle bundle = new Bundle();
             try {
                 byte[] buffer = new byte[4096];
-                int ret = sdlcServiceManager.getIsdlcService().receive(buffer, buffer.length, 10);
+                int ret = sdlcServiceManager.getIsdlcService().receive(buffer, buffer.length, 30);
                 Log.d(TAG, "Line - received return: " + ret);
                 if (ret > 0) {
 
@@ -307,10 +306,16 @@ public class KrNrModemManager {
                 Log.e(TAG, String.format("dialreceive error. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
+
+            //disconnect connection
+            dialhangup();
+        }
+        else{
+            Log.e(TAG, "Cant receive data, SDLC service is disconnected.");
         }
     }
 
-    public void dialHangup() {
+    public void hangup() {
 
         new Thread(new Runnable() {
             @Override
@@ -331,71 +336,9 @@ public class KrNrModemManager {
                 Log.e(TAG, String.format("dialhangup error. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
+        }else{
+            Log.e(TAG, "Cant hangup, SDLC service is disconnected.");
         }
     }
 
-//    int autoDialstep = 0;
-//    int repeat_count = 0;
-//    public void btnDialAuto(View view) {
-//
-//        setEnabled( R.id.btnDial, false );
-//        setEnabled( R.id.btnAuto, false );
-//
-//        loop_count = Integer.valueOf (  ((EditText)findViewById( R.id.edLoop)).getText().toString() );
-//        repeat_count = Integer.valueOf (  ((EditText)findViewById( R.id.edRepeat)).getText().toString() );
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                dial_dial();
-//                autoDialstep = 1;
-//
-//            }
-//        }).start();
-//    }
-//
-//
-//    Handler sdlc_auto_test = new Handler() {
-//        @Override
-//        public void handleMessage(Message msg) {
-//
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    int repeat = repeat_count;
-//                    do {
-//
-//                        Log.i(TAG, "call send");
-//                        dial_send();
-//                        autoDialstep = 2;
-//
-//                        int delay = Integer.valueOf(((EditText) findViewById(R.id.edDelay)).getText().toString());
-//                        if (delay > 0) {
-//                            try {
-//                                Thread.sleep(delay * 1000);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        Log.i(TAG, "call recv");
-//                        dial_recv();
-//                        autoDialstep = 2;
-//                    } while ((--repeat) > 0);
-//
-//                    autoDialstep = 3;
-//                    dial_hangup();
-//
-//
-//                    --loop_count;
-//
-//                }
-//            }).start();
-//        }
-//    };
 }
