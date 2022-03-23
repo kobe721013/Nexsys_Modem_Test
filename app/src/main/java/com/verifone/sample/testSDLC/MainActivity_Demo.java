@@ -25,7 +25,7 @@ public class MainActivity_Demo extends AppCompatActivity {
     TextView tvLogMessage;
 
     int reSendCount = 1;
-    byte[] sam_msg_out = {
+    static public byte[] sam_msg_out = {
             //0x00, 0x4A,//length
             //0x60, 0x09, 0x50, 0x00, 0x00,
             0x60, 0x09, 0x50, 0x00, 0x00,                            			/* TPDU*/
@@ -114,6 +114,8 @@ public class MainActivity_Demo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
+
+        krnrmodemManager = KrNrModemManager.getInstance(getApplicationContext());
         setDialButton(true);
         edLogOutput = findViewById(R.id.textViewMessage);
         tvLogMessage = findViewById(R.id.logmessage);
@@ -122,7 +124,7 @@ public class MainActivity_Demo extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        krnrmodemManager = KrNrModemManager.getInstance(getApplicationContext());
+        Log.d(TAG, "register modem deledate");
         krnrmodemManager.delegate = managerDelegate;
     }
 
@@ -179,6 +181,10 @@ public class MainActivity_Demo extends AppCompatActivity {
         log_output(String.format("Dial to [%s]",number));
         setDialButton(false);
         krnrmodemManager.dialTo(number);
+
+        //start second activity
+        Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
     }
 
     public  void btnHandup(View view)

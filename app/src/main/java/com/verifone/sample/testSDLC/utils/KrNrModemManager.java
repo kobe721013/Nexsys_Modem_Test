@@ -276,10 +276,12 @@ public class KrNrModemManager {
                 Log.d(TAG, "Line - received return: " + ret);
                 if (ret > 0) {
 
+                    byte[] out = new byte[ret];
+                    System.arraycopy(buffer, 0, out, 0, ret);
                     if(delegate != null)
                     {
                         Log.d(TAG,"Callback onReceive()");
-                        delegate.onReceive(buffer);
+                        delegate.onReceive(out);
                     }
 //                    Log.i(TAG, "receive length: " + ret);
 //                    byte[] out = new byte[ret - 5];
