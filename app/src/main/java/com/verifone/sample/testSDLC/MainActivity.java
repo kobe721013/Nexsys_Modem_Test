@@ -340,6 +340,8 @@ public class MainActivity extends AppCompatActivity {
 //                }
 
                 int resultCode = sdlcServiceManager.getIsdlcService().send( sam_msg_out );
+                String sendString = HexDump.dumpHexString(sam_msg_out);
+                Log.d(TAG, "sendString="+sendString);
                 Log.d(TAG, "send resultcode="+resultCode);
 
                 setEnabled( R.id.btnSend, true );
@@ -499,6 +501,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     void log_output(String message){
+
+        Log.d(TAG, message);
         runOnUiThread(new Runnable() {
                           @Override
                           public void run() {

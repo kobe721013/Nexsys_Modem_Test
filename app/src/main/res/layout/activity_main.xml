@@ -34,7 +34,7 @@
                 android:layout_marginLeft="5px"
                 android:layout_marginRight="5px"
                 android:layout_weight="1"
-                android:enabled="true"
+                android:enabled="false"
                 android:onClick="btnInit"
                 android:text="Init" />
 
@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:ems="10"
                     android:inputType="text"
-                    android:text="801" />
+                    android:text="26310152" />
             </LinearLayout>
 
             <LinearLayout
@@ -215,7 +215,7 @@
                 android:layout_marginRight="5px"
 
                 android:layout_weight="1"
-                android:enabled="true"
+                android:enabled="false"
                 android:onClick="btnDial"
                 android:text="Dial" />
 
@@ -227,7 +227,7 @@
                 android:layout_marginRight="5px"
 
                 android:layout_weight="1"
-                android:enabled="true"
+                android:enabled="false"
                 android:onClick="btnSend"
                 android:text="Send" />
 

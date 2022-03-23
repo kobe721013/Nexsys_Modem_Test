@@ -19,6 +19,8 @@ import java.util.Arrays;
 public class KrNrModemManager {
     private static final String TAG = "KrNrModemManager";
 
+
+
     public interface KrNrModemManagerDelegate
     {
         void onDialConnected();
@@ -229,6 +231,8 @@ public class KrNrModemManager {
                 Log.d(TAG,"Sending...");
 
                 int resultCode = sdlcServiceManager.getIsdlcService().send( data );
+                String sendString = HexDump.dumpHexString(data);
+                Log.d(TAG, "sendString="+sendString);
                 if(delegate != null)
                 {
                     Log.d(TAG, "Callback onSendDone(). resultCode:"+resultCode);
@@ -242,6 +246,10 @@ public class KrNrModemManager {
                 Log.e(TAG, String.format("dial_send error. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
+        }
+        else
+        {
+            Log.e(TAG, "dialsend() - but SDLC Service status is disconnected");
         }
     }
 
@@ -307,8 +315,7 @@ public class KrNrModemManager {
                 e.printStackTrace();
             }
 
-            //disconnect connection
-            dialhangup();
+
         }
         else{
             Log.e(TAG, "Cant receive data, SDLC service is disconnected.");
