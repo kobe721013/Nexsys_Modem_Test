@@ -12,7 +12,7 @@ import com.verifone.sample.testSDLC.utils.KrNrModemManager;
 
 public class SecondActivity extends AppCompatActivity {
     private String TAG="SecondActivity";
-    private TextView logmessage;
+    private TextView logMessage;
     private KrNrModemManager krnrmodemManager = null;
     private KrNrModemManager.KrNrModemManagerDelegate modemDelegate = new KrNrModemManager.KrNrModemManagerDelegate() {
         @Override
@@ -55,15 +55,22 @@ public class SecondActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-        logmessage = findViewById(R.id.logmessage);
+        logMessage = findViewById(R.id.logmessage);
         krnrmodemManager = KrNrModemManager.getInstance(getApplicationContext());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "register modem deledate");
+        Log.d(TAG, "register modem delegate");
         krnrmodemManager.delegate = modemDelegate;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy(), unRegister modem delegate.");
+        krnrmodemManager.delegate = null;
     }
 
     void log_output(String message){
@@ -72,8 +79,8 @@ public class SecondActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                logmessage.append("\n");
-                logmessage.append( message );
+                logMessage.append("\n");
+                logMessage.append( message );
 
             }
         });

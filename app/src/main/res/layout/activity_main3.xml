@@ -12,28 +12,6 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/btnBind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px"
-            android:layout_marginRight="5px"
-            android:visibility="gone"
-            android:layout_weight="1"
-            android:onClick="btnBind"
-            android:text="Bind" />
-
-        <Button
-            android:id="@+id/btnGetCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px"
-            android:layout_marginRight="5px"
-            android:visibility="gone"
-            android:layout_weight="1"
-            android:onClick="btnGetCount"
-            android:text="GetCount" />
-
-        <Button
             android:id="@+id/btnClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,15 +34,15 @@
             android:text="Dial" />
 
         <Button
-            android:id="@+id/btnHandup"
+            android:id="@+id/btnHangup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5px"
             android:layout_marginRight="5px"
 
             android:layout_weight="1"
-            android:onClick="btnHandup"
-            android:text="Handup" />
+            android:onClick="btnHangup"
+            android:text="Hangup" />
         <TextView
             android:id="@+id/textViewMessage"
             android:layout_width="wrap_content"

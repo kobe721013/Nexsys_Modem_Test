@@ -17,10 +17,8 @@ import com.verifone.smartpos.sdlc.constdefine.ConstSDLCService;
 import java.util.Arrays;
 
 public class KrNrModemManager {
-    private static final String TAG = "KrNrModemManager";
 
-
-
+    private final String TAG = "KrNrModemManager";
     public interface KrNrModemManagerDelegate
     {
         void onDialConnected();
@@ -52,7 +50,6 @@ public class KrNrModemManager {
         sdlcServiceManager = new SDLCServiceManager(context, new ServiceManager.ServiceManagerIF() {
             @Override
             public void onBindSuccess() {
-                //
                 Log.d(TAG, "SDLC Service onBindSuccess() event." );
             }
 
@@ -98,9 +95,7 @@ public class KrNrModemManager {
                     sdlcListener = new SdlcListener.Stub() {
                         @Override
                         public void onConnect() throws RemoteException {
-                            //notes:測試過，撥通沒有event上來
                             Log.i(TAG, "Line - onConnect() event");
-
                             if(delegate != null)
                             {
                                 Log.d(TAG, "callback To onDialConnected()");
@@ -111,7 +106,7 @@ public class KrNrModemManager {
                         @Override
                         public void onDisconect() throws RemoteException {
 
-                            Log.i(TAG, "Line onDisconect() event.");
+                            Log.i(TAG, "Line onDisconnect() event.");
 
 
 //                            if( loopCount > 1 ) {
@@ -156,37 +151,37 @@ public class KrNrModemManager {
         }
     }
 
-    public void modemDeinit() {
+    public void modemDeInit() {
         if( sdlcServiceManager.isConnected() ) {
             Bundle bundle = new Bundle();
             try {
                 sdlcServiceManager.getIsdlcService().deinit(bundle);
             } catch (RemoteException e) {
-                Log.e(TAG, String.format("modemDeinit Exception occurs. Exception:%s", e.toString()));
+                Log.e(TAG, String.format("modemDeInit Exception occurs. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
         }
         else
         {
-            Log.e(TAG, "modemDeinit() - but SDLC Service status is disconnected");
+            Log.e(TAG, "modemDeInit() - but SDLC Service status is disconnected");
         }
     }
 
-    public void dialTo(String phoneNmmber) {
+    public void dialTo(String phoneNumber) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                dialto(phoneNmmber);
+                dialto(phoneNumber);
             }
         }).start();
 
     }
-    private void dialto(String phoneNmmber) {
+    private void dialto(String phoneNumber) {
 
         if( sdlcServiceManager.isConnected() ){
             Bundle bundle = new Bundle();
-            bundle.putString( "number", phoneNmmber );
+            bundle.putString( "number", phoneNumber );
             bundle.putInt( "timeout", 60 );
 
 //            bundle.putString(ConstSDLCService.dialup.bundle_fixed_atd_command, "ATD");
@@ -214,18 +209,16 @@ public class KrNrModemManager {
 
     }
 
-    byte[] msg_sent;
-
     public void send(byte[] data) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                dialsend(data);
+                dialSend(data);
             }
         }).start();
     }
-    void dialsend(byte[] data) {
+    void dialSend(byte[] data) {
         if( sdlcServiceManager.isConnected() ){
             try {
                 Log.d(TAG,"Sending...");
@@ -240,7 +233,7 @@ public class KrNrModemManager {
                 }
 
                 //start to receive data
-                dialreceive();
+                dialReceive();
 
             } catch (RemoteException e) {
                 Log.e(TAG, String.format("dial_send error. Exception:%s", e.toString()));
@@ -249,7 +242,7 @@ public class KrNrModemManager {
         }
         else
         {
-            Log.e(TAG, "dialsend() - but SDLC Service status is disconnected");
+            Log.e(TAG, "dialSend() - but SDLC Service status is disconnected");
         }
     }
 
@@ -259,13 +252,13 @@ public class KrNrModemManager {
                 new Runnable() {
                     @Override
                     public void run() {
-                        dialreceive();
+                        dialReceive();
                     }
                 }
         ).start();
     }
 
-    private void dialreceive(){
+    private void dialReceive(){
         if( sdlcServiceManager.isConnected() ) {
             Log.d(TAG, "Receiving ...");
 
@@ -313,11 +306,9 @@ public class KrNrModemManager {
                     Log.e(TAG, "Error happen: " + ret);
                 }
             } catch (RemoteException e) {
-                Log.e(TAG, String.format("dialreceive error. Exception:%s", e.toString()));
+                Log.e(TAG, String.format("dialReceive error. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
-
-
         }
         else{
             Log.e(TAG, "Cant receive data, SDLC service is disconnected.");
@@ -329,20 +320,20 @@ public class KrNrModemManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                dialhangup();
+                dialHangup();
             }
         }).start();
 
     }
 
-    private void dialhangup() {
+    private void dialHangup() {
         if( sdlcServiceManager.isConnected() ){
             Log.d( TAG,"hang up ..." );
             Bundle bundle = new Bundle();
             try {
                 sdlcServiceManager.getIsdlcService().hangup( sdlcListener );
             } catch (RemoteException e) {
-                Log.e(TAG, String.format("dialhangup error. Exception:%s", e.toString()));
+                Log.e(TAG, String.format("dialHangup error. Exception:%s", e.toString()));
                 e.printStackTrace();
             }
         }else{

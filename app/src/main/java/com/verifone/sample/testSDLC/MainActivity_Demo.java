@@ -18,16 +18,14 @@ import com.verifone.sample.testSDLC.utils.KrNrModemManager;
 
 public class MainActivity_Demo extends AppCompatActivity {
 
-    private KrNrModemManager krnrmodemManager;
-    private KrNrService krnrService;
     private String TAG="MainActivity_Demo";
-    TextView edLogOutput;
-    TextView tvLogMessage;
+    private KrNrModemManager krnrmodemManager;
+
+    private TextView edLogOutput;
+    private TextView tvLogMessage;
 
     int reSendCount = 1;
     static public byte[] sam_msg_out = {
-            //0x00, 0x4A,//length
-            //0x60, 0x09, 0x50, 0x00, 0x00,
             0x60, 0x09, 0x50, 0x00, 0x00,                            			/* TPDU*/
             0x02, 0x00,                                        						/* msg_out Type ID = sale */
             0x70, 0x24, 0x05, (byte) 0x80, 0x00, (byte) 0xC0, 0x00, 0x04, /* Bit map            */
@@ -45,7 +43,7 @@ public class MainActivity_Demo extends AppCompatActivity {
 
     };
 
-    KrNrModemManager.KrNrModemManagerDelegate managerDelegate = new KrNrModemManager.KrNrModemManagerDelegate() {
+    private KrNrModemManager.KrNrModemManagerDelegate managerDelegate = new KrNrModemManager.KrNrModemManagerDelegate() {
         @Override
         public void onDialConnected() {
             log_output("onDialConnected() event.");
@@ -80,6 +78,7 @@ public class MainActivity_Demo extends AppCompatActivity {
 
             if(reSendCount >=0)
             {
+                //simulation: send twice data in a row.
                 Log.d(TAG, "reSend data again");
                 krnrmodemManager.send(sam_msg_out);
             }
@@ -124,50 +123,16 @@ public class MainActivity_Demo extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "register modem deledate");
+        Log.d(TAG, "register modem delegate");
         krnrmodemManager.delegate = managerDelegate;
     }
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG,"onDestroy");
         super.onDestroy();
-//        unbindService(connection);
+        Log.d(TAG, "onDestroy(), unRegister modem delegate.");
+        krnrmodemManager.delegate = null;
     }
-
-    public void btnBind(View view) {
-
-        Log.d(TAG, "btnBind click.");
-        // 綁定 Service
-        Intent serviceIntent = new Intent(this, KrNrService.class);
-        this.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-
-    }
-
-   public void btnGetCount(View view)
-   {
-       if(krnrService != null)
-       {
-           edLogOutput.append(String.format("%d", krnrService.currentCount));
-       }
-   }
-
-    public ServiceConnection connection = new ServiceConnection() {
-
-        // 成功與 Service 建立連線
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            krnrService = ((KrNrService.MyBinder) service).getService();
-            Log.d(TAG, "MainActivity_2 onServiceConnected");
-        }
-
-        // 與 Service 建立連線失敗
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            krnrService = null;
-            Log.d(TAG, "MainActivity_2 onServiceDisconnected");
-        }
-    };
 
     public void btnClose(View view)
     {
@@ -187,7 +152,7 @@ public class MainActivity_Demo extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public  void btnHandup(View view)
+    public  void btnHangup(View view)
     {
         Log.d(TAG, "Dial buton click");
         setDialButton(false);
@@ -197,7 +162,7 @@ public class MainActivity_Demo extends AppCompatActivity {
     void setDialButton(boolean enable)
     {
         setEnabled(R.id.btnDial, enable);
-        setEnabled(R.id.btnHandup, !enable);
+        setEnabled(R.id.btnHangup, !enable);
     }
 
     void setEnabled( int id, boolean enable){

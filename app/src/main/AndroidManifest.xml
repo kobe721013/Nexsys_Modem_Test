@@ -26,10 +26,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".KrNrService"
-            android:enabled="true"
-            android:exported="true" />
     </application>
 
 </manifest>
